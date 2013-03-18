@@ -1,7 +1,7 @@
 SideWalkEmpire
 ==============
 
-Libgdx Game SideWalkEmpire
+Libgdx / HTML5 Game SideWalkEmpire
 
 
 All original artistic works Copyright ©2013 Edward Ahn.
