@@ -1,0 +1,124 @@
+
+sidewalkempire_demo.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+menu_toolbar
+  rotate: false
+  xy: 1, 763
+  size: 480, 250
+  orig: 480, 250
+  offset: 0, 0
+  index: -1
+Me_temp1
+  rotate: false
+  xy: 1, 299
+  size: 184, 462
+  orig: 184, 462
+  offset: 0, 0
+  index: -1
+me_template
+  rotate: false
+  xy: 187, 300
+  size: 184, 461
+  orig: 184, 461
+  offset: 0, 0
+  index: -1
+shack
+  rotate: false
+  xy: 483, 705
+  size: 315, 308
+  orig: 315, 308
+  offset: 0, 0
+  index: -1
+me_body
+  rotate: false
+  xy: 1, 88
+  size: 151, 209
+  orig: 151, 209
+  offset: 0, 0
+  index: -1
+Me_HEad
+  rotate: false
+  xy: 800, 863
+  size: 124, 150
+  orig: 124, 150
+  offset: 0, 0
+  index: -1
+tee_body
+  rotate: false
+  xy: 373, 639
+  size: 66, 122
+  orig: 66, 122
+  offset: 0, 0
+  index: -1
+me_lowerrightleg
+  rotate: false
+  xy: 441, 676
+  size: 40, 85
+  orig: 40, 85
+  offset: 0, 0
+  index: -1
+me_UpperLeg
+  rotate: false
+  xy: 1, 1
+  size: 46, 85
+  orig: 46, 85
+  offset: 0, 0
+  index: -1
+me_upperarm
+  rotate: false
+  xy: 800, 769
+  size: 38, 92
+  orig: 38, 92
+  offset: 0, 0
+  index: -1
+me_upperleftLeg
+  rotate: false
+  xy: 926, 928
+  size: 42, 85
+  orig: 42, 85
+  offset: 0, 0
+  index: -1
+me_lowerleftleg
+  rotate: false
+  xy: 373, 552
+  size: 36, 85
+  orig: 36, 85
+  offset: 0, 0
+  index: -1
+me_lowerArm
+  rotate: false
+  xy: 49, 15
+  size: 42, 71
+  orig: 42, 71
+  offset: 0, 0
+  index: -1
+tee_arm
+  rotate: false
+  xy: 840, 818
+  size: 46, 43
+  orig: 46, 43
+  offset: 0, 0
+  index: -1
+me_leftshoe
+  rotate: false
+  xy: 483, 678
+  size: 54, 25
+  orig: 54, 25
+  offset: 0, 0
+  index: -1
+me_rightshoe
+  rotate: false
+  xy: 483, 678
+  size: 54, 25
+  orig: 54, 25
+  offset: 0, 0
+  index: -1
+me_hand
+  rotate: false
+  xy: 441, 640
+  size: 38, 34
+  orig: 38, 34
+  offset: 0, 0
+  index: -1
