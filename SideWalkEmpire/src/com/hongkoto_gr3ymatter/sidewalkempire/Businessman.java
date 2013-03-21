@@ -1,10 +1,14 @@
 package com.hongkoto_gr3ymatter.sidewalkempire;
 
+import java.util.HashMap;
+
 public class Businessman extends Customer {
 	
 	public Businessman() {
 		
-		preferences.put("name", "Businessman");
+		name = "Businessman";
+		
+		HashMap<String, Double> preferences = new HashMap<String,Double>();
 		preferences.put("Donuts", 0.5);
 		preferences.put("Biscotti", 1.5);
 		preferences.put("Espresso Machine", 1.0);
