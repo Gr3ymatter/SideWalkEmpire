@@ -8,7 +8,7 @@ public class Businessman extends Customer {
 		
 		name = "Businessman";
 		
-		HashMap<String, Double> preferences = new HashMap<String,Double>();
+		
 		preferences.put("Donuts", 0.5);
 		preferences.put("Biscotti", 1.5);
 		preferences.put("Espresso Machine", 1.0);
