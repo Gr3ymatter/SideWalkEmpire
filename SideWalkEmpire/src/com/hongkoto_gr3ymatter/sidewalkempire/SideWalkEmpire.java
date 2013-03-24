@@ -7,23 +7,14 @@ import com.badlogic.gdx.Game;
 
 public class SideWalkEmpire extends Game {
 
-	public Assets assets;
 	
 	@Override
 	public void create() {
-		this.assets = new Assets();
-		assets.load();
-		setScreen(new GameScreen(assets));
+		Assets.load();
+		setScreen(new GameScreen(this));
 		
 	}
 
-	public Assets getAssets() {
-		return assets;
-	}
-
-	public void setAssets(Assets assets) {
-		this.assets = assets;
-	}
 	
 	
 

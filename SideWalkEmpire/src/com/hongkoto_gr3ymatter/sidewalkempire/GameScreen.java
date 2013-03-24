@@ -2,7 +2,6 @@ package com.hongkoto_gr3ymatter.sidewalkempire;
 
 
 
-import Models.Assets;
 import Models.Menu;
 import Models.Person;
 import Models.Tee;
@@ -15,12 +14,16 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameScreen implements Screen {
 
-	Assets assets;
+	Game game;
+	
 	Stage stage;
 	
 	Image image;
@@ -28,29 +31,36 @@ public class GameScreen implements Screen {
 	Menu menu;
 	Tee tee;
 	Person person;
-	Person randomPerson;
 	Camera camera;
+	Array<Person> randomPeople;
+	long lastPersonTime;
 	
-	
-	public GameScreen(Assets assets){
-		this.assets = assets;
+	public GameScreen(Game game){
 		this.stage = new Stage();
-		
+		this.game = game;
 		Gdx.input.setInputProcessor(stage);
 		atlas = new TextureAtlas(Gdx.files.internal("data/sidewalkempire_demo.pack"));
 		menu = new Menu();
 		tee = new Tee();
-		person = new Person(170, 500);
+		
+		randomPeople = new Array<Person>();
+		spawnRandomPeople();
 	}
 	
 	@Override
 	public void render(float delta) {
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		stage.act(Gdx.graphics.getDeltaTime());
+		stage.act(delta);
+		
 		stage.draw();
 		
 		
+		if(TimeUtils.millis() - lastPersonTime > 7000)
+				spawnRandomPeople();
+		
+		
+		//Gdx.app.log("People ", "" + randomPeople.size);
 		// Debuging Rendering
 		//Gdx.app.log("Image", "Stage Width:" + stage.getWidth() + " Stage Height: " + stage.getHeight());
 		//Gdx.app.log("Image", "Image Width:" + image.getWidth() + " Image Height: " + image.getHeight());
@@ -62,7 +72,7 @@ public class GameScreen implements Screen {
 		this.camera.position.set(480/2, 800/2, 0);
 		stage.setCamera(camera);
 		
-		stage.setViewport(480, 800, true);
+		stage.setViewport(480, 800, false);
 		
 		
 		// stage.getCamera().translate(-stage.getGutterWidth(), -stage.getGutterWidth(), 0);
@@ -78,13 +88,17 @@ public class GameScreen implements Screen {
 		image.setSize(480, 800);
 		image.setPosition(0, 200);
 		
+		Image cartImage = new Image(new Texture(Gdx.files.internal("data/cart.png")));
+		cartImage.setScale(.75f, .75f);
+		cartImage.setPosition(175, 450);
+		
 		
 		//Gdx.app.log("Image", "Stage Width:" + stage.getWidth() + " Stage Height: " + stage.getHeight());
 		stage.addActor(image);
+		stage.addActor(cartImage);
+
 		stage.addActor(menu);
-		stage.addActor(tee);
-		stage.addActor(person);
-	
+	//	stage.addActor(tee);
 	}
 
 	@Override
@@ -113,6 +127,16 @@ public class GameScreen implements Screen {
 	}
 
 
+	private void spawnRandomPeople(){
+		int x = 0;
+		int y = MathUtils.random(250, 500);
+		int rand = MathUtils.random(0, 480);
+
+		Person person = new Person(x, y, rand);
+		randomPeople.add(person);
+		stage.addActor(person);
+		lastPersonTime = TimeUtils.millis();
+	}
 	
 	
 }

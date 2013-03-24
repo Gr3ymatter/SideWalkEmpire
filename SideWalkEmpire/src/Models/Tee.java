@@ -39,7 +39,7 @@ public class Tee extends Actor{
 
 		totalTime += delta;
 		
-		Gdx.app.log("Message", "Time: " + totalTime);
+	//	Gdx.app.log("Message", "Time: " + totalTime);
 		
 	
 		Assets.teeSwayAnimation.apply(skeleton, totalTime, true);

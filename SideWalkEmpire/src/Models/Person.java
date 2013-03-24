@@ -13,17 +13,21 @@ public class Person extends Actor {
 	public Skeleton skeleton;
 	float totalTime;
 	Assets assets;
+	int rand;
+	boolean headScratch;
+	public String state;
 
-	public Person (int width, int height){		
-		skeleton =  assets.customerSkeleton;
-		
+
+	public Person (int width, int height, int rand){		
+		skeleton =  Assets.getCustomerSkeleton();
+		this.rand = rand;
 		root = skeleton.getRootBone();
 		root.setX(width);
 		root.setY(height);
-		root.setScaleX(.25f);
-		root.setScaleY(.25f);
+		root.setScaleX(.08f);
+		root.setScaleY(.08f);
 		skeleton.updateWorldTransform();
-		
+		headScratch = false;
 	}
 
 	@Override
@@ -35,19 +39,61 @@ public class Person extends Actor {
 
 	@Override
 	public void act(float delta) {
-		
 		totalTime += delta;
-						
-		if(totalTime > 3){
-		float animTime = totalTime - 3;
-			
-		Assets.customerIdleAnimation.apply(skeleton, animTime, false); 			
 		
-		}if(totalTime >10) totalTime = 0;
+		randomMovement(delta);
+
+		
+		/*
+		if(!headScratch){
+
+		if(totalTime > rand){
+		float animTime = totalTime - rand;
+			 Assets.customerIdleAnimation.apply(skeleton, animTime, false); 
+			 headScratch = true;
+		}
+		 
+		}if(totalTime >(rand+3)) totalTime = 0;
 		
 		skeleton.updateWorldTransform();
+		Gdx.app.log("TotalTime: ", "" + totalTime);
+			
+	 */
+	 
 	}
 	
 
+	public void randomMovement(float delta){
+		
+		Assets.customerWalkingAnimation.apply(skeleton, totalTime, true);
+		
+		skeleton.updateWorldTransform();
+		
+		if(state != "Idle")
+			root.setX(root.getX()+1f);
+		
+		if(root.getX() == rand){
+			
+			state = "Idle";
+			
+			float animTime = totalTime - totalTime;
+			
+			Assets.customerIdleAnimation.apply(skeleton, totalTime, false);
+		
+			
+			if(totalTime >= 1200){
+				state = "moving";
+				totalTime = 0;
+				Gdx.app.log("TotalTime: ", "" + totalTime);
+				
+			}
+		}
+		
+		
+		
+		skeleton.updateWorldTransform();
+
+		
+	}
 	
 }
