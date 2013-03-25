@@ -1,6 +1,8 @@
 package com.hongkoto_gr3ymatter.sidewalkempire;
 
 
+
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,16 +11,22 @@ public class Store {
 	
 	private HashMap<String,ArrayList<String>> stageConstraints, menuAdditions;
 	private HashMap<String, Float> inventory, menuPrices, equipmentPrices, wholesalePrices;
-	private ArrayList<String> menu;
+	private ArrayList<String> menu, pastries;
 
 	private int stageNumber;
 	private float levelOfDifficulty;
+	private int numberOfPurchases;
+	private int numberOfPotentialCustomers;
+
 
 	
 	Store(){
 		// Constructor, build following HashMaps: stageConstraints, inventory, menuPrices, equipmentPrices, wholesalePrices, menuAdditions
 		stageNumber = 1;
-		levelOfDifficulty = 1.0f;  // 1.0 easy, 2.0 medium, 3.0 hard
+		levelOfDifficulty = 1.5f;  // 1.0 easy, 2.0 medium, 3.0 hard
+		numberOfPurchases = 0;
+		numberOfPotentialCustomers = 0;
+		
 		stageConstraints = new HashMap<String, ArrayList<String>>();
 		stageConstraints.put("Title", new ArrayList<String>() {{add("The Avenues");}});
 
@@ -26,7 +34,7 @@ public class Store {
 																	add("Laborer");
 																	add("Student");}});
 		
-		stageConstraints.put("Equipment Available", new ArrayList<String>(){{add("Espresso Machine");
+		stageConstraints.put("Equipment Available", new ArrayList<String>(){{add("Basic Espresso Machine");
 																			add("Pastry Rack");}});
 		
 		stageConstraints.put("Equipment Purchased", new ArrayList<String>(){{add("Coffee Machine");}});
@@ -42,46 +50,58 @@ public class Store {
 		
 		
 		inventory = new HashMap<String,Float>();
-		inventory.put("Cash", 1000.00f);
-		inventory.put("Coffee Beans", 20.0f);
+		inventory.put("Cash", 100.00f);
+		inventory.put("Coffee Beans", 10.0f);
+		inventory.put("Biscotti", 5.0f);
 		
 		menuPrices = new HashMap<String,Float>();
-		menuPrices.put("Donut", 0.5f);
-		menuPrices.put("Scone", 0.75f);
-		menuPrices.put("Biscotti", 0.75f);
-		menuPrices.put("Danish", 0.75f);
+		menuPrices.put("Donut", 0.75f);
+		menuPrices.put("Scone", 1.25f);
+		menuPrices.put("Biscotti", 1.00f);
+		menuPrices.put("Danish", 1.50f);
 		menuPrices.put("Mocha", 3.50f);
-		menuPrices.put("Cappucino", 3.50f);
-		menuPrices.put("Espress Shot", 2.50f);
+		menuPrices.put("Cappuccino", 3.50f);
+		menuPrices.put("Espresso Shot", 2.50f);
 		menuPrices.put("Latte", 3.50f);
 		menuPrices.put("Coffee", 2.00f);
+		menuPrices.put("Muffin", 1.50f);
 		
 		equipmentPrices = new HashMap<String,Float>();
-		equipmentPrices.put("Espresso Machine", 2000.00f);
-		equipmentPrices.put("Roaster", 10000.00f);
-		equipmentPrices.put("Pastry Rack", 750.00f);
-		equipmentPrices.put("Next Level", 15000.00f);
+		equipmentPrices.put("Basic Espresso Machine", 500.00f);
+		equipmentPrices.put("Roaster", 2000.00f);
+		equipmentPrices.put("Pastry Rack", 200.00f);
+		equipmentPrices.put("Next Level", 5000.00f);
 		
 		wholesalePrices = new HashMap<String,Float>();
 		wholesalePrices.put("Coffee Beans", 5.00f);
-		wholesalePrices.put("Donuts", 0.5f);
-		wholesalePrices.put("Scones", 0.75f);
-		wholesalePrices.put("Biscotti", 0.75f);
-		wholesalePrices.put("Danish", 0.75f);
+		wholesalePrices.put("Donut", 0.25f);
+		wholesalePrices.put("Scone", 0.50f);
+		wholesalePrices.put("Biscotti", 0.25f);
+		wholesalePrices.put("Danish", 0.50f);
+		wholesalePrices.put("Muffin", 0.50f);
 		
 		menu = new ArrayList<String>();
 		
 		menu.add("Coffee");
 		menu.add("Biscotti");
 		
+		pastries = new ArrayList<String>();
+		
+		pastries.add("Biscotti");
+		pastries.add("Donut");
+		pastries.add("Scone");
+		pastries.add("Danish");
+		pastries.add("Muffin");
+		
 		menuAdditions = new HashMap<String, ArrayList<String>>();
 		menuAdditions.put("Pastry Rack", new ArrayList<String>() {{add("Donut");
 																	add("Scone");
-																	add("Danish");}});
+																	add("Danish");
+																	add("Muffin");}});
 		
-		menuAdditions.put("Espresso Machine", new ArrayList<String>() {{add("Mocha");
+		menuAdditions.put("Basic Espresso Machine", new ArrayList<String>() {{add("Mocha");
 																		add("Latte");
-																		add("Cappucino");
+																		add("Cappuccino");
 																		add("Espresso Shot");}});
 		
 		}
@@ -126,6 +146,65 @@ public class Store {
 		}
 	
 	}		
+	public void purchaseEquipment(String equipment){
+		if (stageConstraints.get("Equipment Available").contains(equipment)){
+			if (inventory.get("Cash") - equipmentPrices.get(equipment) >= 0.0f){
+				addPurchase(-equipmentPrices.get(equipment));
+				stageConstraints.get("Equipment Available").remove(equipment);
+				stageConstraints.get("Equipment Purchased").add(equipment);
+				if (menuAdditions.containsKey(equipment)){
+					if (equipment.equals("Pastry Rack")){
+						//Add pastry items to menu plus the inventory and add dialogue about new menu items!
+						for (String item: menuAdditions.get(equipment)){
+							menu.add(item);
+							inventory.put(item, 5.0f);
+							}
+						}
+					if (equipment.equals("Basic Espresso Machine")){
+						// Add espresso drinks to menu plus dialogue about being able to serve new drinks
+						for (String item: menuAdditions.get(equipment)){
+							menu.add(item);
+							}
+						
+						}
+					
+					}
+				
+				
+				
+				
+				//Add dialogue boxes here to confirm you bought cool equipment e.g., Congrats you bought an ESPRESSO MACHINE!!
+				}else{
+					//Can't afford the equipment
+					System.out.println("Sorry, you can't afford this equipment.");
+					}
+			}else{
+				// Equipment not available at this point, should not be called but stub is here just in case.
+				
+				}
+			
+		
+		}
+	
+
+	
+	public void purchaseInventory(String item, float quantity){
+		if (inventory.containsKey(item)){
+			if (quantity * wholesalePrices.get(item) <= inventory.get("Cash")){
+				inventory.put(item, inventory.get(item) + quantity);
+				addPurchase(-(quantity * wholesalePrices.get(item)));
+				
+				}else{
+					// Not enough money
+					System.out.println("Not enough money.");
+					}
+			}else{
+				//Item not available
+				System.out.println("Item not available.");
+				}
+		
+		
+		}
 	
 	public HashMap<String,ArrayList<String>> getStageConstraints(){
 		return stageConstraints;
@@ -145,7 +224,7 @@ public class Store {
 		}
 	
 	public void addPurchase(float purch){
-		// Adds parameter to total cash.
+		// Adds parameter to total cash, use negative number for taking money.
 		inventory.put("Cash", inventory.get("Cash") + purch);
 		}
 		
@@ -173,12 +252,21 @@ public class Store {
 		menu.add(item);
 		}
 	
+	public int getNumberOfPurchases(){
+		return numberOfPurchases;
+		}
+	
+	public int getNumberOfPotentialCustomers(){
+		return numberOfPotentialCustomers;
+		}
+	
 	//Need to add public set menus as well.  Probably will have method name for setHashMap, and take "key" and "value" inputs
 	// HashMap.put("key", "value") inside method.
 	
 	void determinePreference(Customer cust){
 		//Method takes as input customer object, iterates through input Customer preference Hashmap, compares against store inventory, 
 		//and stores number greater than 0.0 to Customer.customerPreference field.
+		numberOfPotentialCustomers++;
 		float prefLevel = 0.0f;
 		for (String item: cust.getPreferences().keySet() ){
 			if (this.inventory.containsKey(item)) prefLevel += cust.getPreferences().get(item); 
@@ -196,6 +284,7 @@ public class Store {
 	void convertCustomer(Customer cust){
 		// Method takes as input Customer object and uses cust.customerPreference to determine if customer enters store.	
 		// Set cust.converted to boolean result;
+		
 		if (cust.getCustomerPreference() > this.levelOfDifficulty) {
 			cust.setConverted(true);
 		}else {cust.setConverted(false);}
@@ -207,21 +296,27 @@ public class Store {
 	
 	void makePurchase(Customer cust){
 		// Method takes Customer object and uses cust.customerPreference and this.inventory as inputs to calculate amount of purchase.
+		numberOfPurchases++;
 		float purchaseTotal = 0.0f;
-		System.out.println("Purchase!");
-		
+		String previouslyPurchasedItem;
+		previouslyPurchasedItem = "";
 		int endloop = (int)cust.getCustomerPreference();
 		Random randmaker = new Random();
 		
-		for (int i = 0; i <= endloop; i++){
+		for (int i = 0; i < endloop; i++){
 			
 			
-			String purchasedItem = getMenu().get((int)((randmaker.nextFloat() * getMenu().size()) ));
-			if (randmaker.nextFloat()<= 0.70f){
+			String purchasedItem = getMenu().get(randmaker.nextInt(getMenu().size()));
+			if (pastries.contains(previouslyPurchasedItem)) {
+				
+				while (pastries.contains(purchasedItem)){
+					purchasedItem = getMenu().get(randmaker.nextInt(getMenu().size()));				
+				}
+				} else if (randmaker.nextFloat()<= 0.60f){
 			// if true, forces customer to buy something within their preferences if in stock.
 				for (String item: cust.getPreferences().keySet()) {
 					if (menu.contains(item)){
-						if (randmaker.nextFloat() >= 0.40){
+						if (randmaker.nextFloat() >= 0.50f){
 							purchasedItem = item;
 						}
 						}
@@ -237,6 +332,7 @@ public class Store {
 					//add purchase to purchase total and reduce one unit from inventory.
 					purchaseTotal += getMenuPrices().get(purchasedItem);
 					inventory.put(purchasedItem, inventory.get(purchasedItem) - 1.0f);
+					cust.addPurchasedItem(purchasedItem);
 						}
 				
 				// Add higher probability of purchasing from favorite items.  
@@ -244,18 +340,23 @@ public class Store {
 				if (getInventory().get("Coffee Beans") >= 0.1f){
 					purchaseTotal += getMenuPrices().get(purchasedItem);
 					inventory.put("Coffee Beans", inventory.get("Coffee Beans") - 0.1f);
+					cust.addPurchasedItem(purchasedItem);
 					}else{
 						// Coffee Beans out of stock, can't make drink
 						// Use this to create Customer text output of dissatisfaction.
+						System.out.println("Sorry, can't make you a drink, out of coffee beans!");
 						}
 				
 				}
 		
 			
-			
+			previouslyPurchasedItem = purchasedItem;
 			
 			} // end for loop
-
+		if (purchaseTotal <= 0.0f) {
+			cust.setConverted(false);
+			numberOfPurchases--;
+		}
 		cust.setPurchase(purchaseTotal);  
 		
 	}

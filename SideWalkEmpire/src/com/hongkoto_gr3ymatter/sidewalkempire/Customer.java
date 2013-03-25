@@ -1,6 +1,5 @@
 package com.hongkoto_gr3ymatter.sidewalkempire;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,10 +12,12 @@ public class Customer {
 	protected float purchase; // after make purchase is run, store value here?
 	protected float customerPreference; // after preference is determined in store method, store value here?
 	protected String type;
+	protected ArrayList<String> purchasedItems;
 	
 	Customer(){
 		// Only consistent aspect is name across customer constructors
 		preferences = new HashMap<String,Float>();
+		purchasedItems = new ArrayList<String>();
 		//Placeholder constructor
 	}
 
@@ -52,6 +53,14 @@ public class Customer {
 		
 	public float getPurchase(){
 		return purchase;
+		}
+		
+	public ArrayList<String> getPurchasedItems(){
+		
+		return purchasedItems;
+		}
+	public void addPurchasedItem(String item){
+		purchasedItems.add(item);
 		}
 	
 }
