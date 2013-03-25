@@ -6,16 +6,16 @@ public class Businessman extends Customer {
 	
 	public Businessman() {
 		
-		name = "Businessman";
+		type = "Businessman";
 		
 		
-		preferences.put("Donuts", 0.5);
-		preferences.put("Biscotti", 1.5);
-		preferences.put("Espresso Machine", 1.0);
-		preferences.put("Pastry Rack", 1.5);
-		preferences.put("Roaster", 1.5);
-		preferences.put("Colombian", 0.75);
-		preferences.put("Spanish Dark", 1.5);
+		preferences.put("Donuts", 0.5f);
+		preferences.put("Biscotti", 1.5f);
+		preferences.put("Espresso Machine", 1.0f);
+		preferences.put("Pastry Rack", 1.5f);
+		preferences.put("Roaster", 1.5f);
+		preferences.put("Colombian", 0.75f);
+		preferences.put("Spanish Dark", 1.5f);
 		
 	}
 

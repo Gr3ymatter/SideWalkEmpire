@@ -6,11 +6,11 @@ public class Teacher extends Customer {
 
 	public Teacher() {
 		
-		name = "Teacher";
+		type = "Teacher";
 		
-		preferences.put("Espresso Machine", 1.5);
-		preferences.put("Cinnamon", 0.75);
-		preferences.put("Bourbon", 1.5);
+		preferences.put("Espresso Machine", 1.5f);
+		preferences.put("Cinnamon", 0.75f);
+		preferences.put("Bourbon", 1.5f);
 
 	}
 
