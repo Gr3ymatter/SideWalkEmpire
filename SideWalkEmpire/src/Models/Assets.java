@@ -3,6 +3,8 @@ package Models;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonBinary;
@@ -22,18 +24,22 @@ public class Assets {
 	public static Animation customerIdleAnimation;
 	public static SkeletonBinary skelBinary;
 	public static SkeletonData skeletonData;
-
-
+	public static Skeleton techieSkeleton;
+	public static Skin skin;
+	public static Array <Animation> animArray;
 
 	public  static void load(){
 		
-		atlas = new TextureAtlas(Gdx.files.internal("data/sidewalkempire_demo.pack"));
-
+		atlas = new TextureAtlas(Gdx.files.internal("data/cust.pack"));
 		
 		menuRegion = atlas.findRegion("menu_toolbar");
 		cartRegion = atlas.findRegion("shack");
-				
+			
 		skelBinary = new SkeletonBinary(atlas);
+		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/techie.skel"));
+		techieSkeleton = new Skeleton(skeletonData);
+		animArray = skeletonData.getAnimations();
+		
 		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/tee.skel"));
 		teeSkeleton = new Skeleton(skeletonData);
 		teeWaveAnimation = skelBinary.readAnimation(Gdx.files.internal("data/tee-Wave.anim"), skeletonData);
@@ -42,12 +48,17 @@ public class Assets {
 		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/nara.skel"));
 		customerWalkingAnimation = skelBinary.readAnimation(Gdx.files.internal("data/nara-Walk.anim"), skeletonData);
 		customerIdleAnimation = skelBinary.readAnimation(Gdx.files.internal("data/nara-Idle.anim"), skeletonData);
-
+		
+		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+		//skin.addRegions(new TextureAtlas(Gdx.files.internal("data/uiskin.pack")));
 	}
 	
 	public static Skeleton getCustomerSkeleton(){
 		//skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/skeleton.skel"));
 		 return new Skeleton(skeletonData);
 	}
-	
+
+
 }
+
+

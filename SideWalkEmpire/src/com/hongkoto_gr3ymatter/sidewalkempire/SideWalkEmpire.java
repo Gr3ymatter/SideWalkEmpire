@@ -11,7 +11,7 @@ public class SideWalkEmpire extends Game {
 	@Override
 	public void create() {
 		Assets.load();
-		setScreen(new GameScreen(this));
+		setScreen(new MenuScreen(this));
 		
 	}
 

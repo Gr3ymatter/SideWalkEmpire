@@ -16,22 +16,34 @@ public class Person extends Actor {
 	int rand;
 	boolean headScratch;
 	public String state;
+	boolean right;
+	
 
 
 	public Person (int width, int height, int rand){		
 		skeleton =  Assets.getCustomerSkeleton();
 		this.rand = rand;
+		
 		root = skeleton.getRootBone();
-		root.setX(width);
+		
+		if(rand > 0.5){
+			root.setX(width);
+			right = false;
+		}
+		else{ 
+			root.setX(490);
+			right = true;
+		}
 		root.setY(height);
-		root.setScaleX(.08f);
-		root.setScaleY(.08f);
+		root.setScaleX(.05f);
+		root.setScaleY(.05f);
 		skeleton.updateWorldTransform();
 		headScratch = false;
 	}
 
 	@Override
 	public void draw(SpriteBatch batch, float parentAlpha) {
+		
 		
 		skeleton.draw(batch);
 		
@@ -42,8 +54,7 @@ public class Person extends Actor {
 		totalTime += delta;
 		
 		randomMovement(delta);
-
-		
+	
 		/*
 		if(!headScratch){
 
@@ -65,12 +76,21 @@ public class Person extends Actor {
 
 	public void randomMovement(float delta){
 		
+		if(right != true){
+		
 		Assets.customerWalkingAnimation.apply(skeleton, totalTime, true);
 		
-		skeleton.updateWorldTransform();
+		root.setX(root.getX()+1f);
 		
-		if(state != "Idle")
-			root.setX(root.getX()+1f);
+		}else{
+			
+			skeleton.setFlipX(true);
+			Assets.customerWalkingAnimation.apply(skeleton, totalTime, true);
+			root.setX(root.getX()-1f);
+
+		}
+		
+		/*
 		
 		if(root.getX() == rand){
 			
@@ -87,13 +107,18 @@ public class Person extends Actor {
 				Gdx.app.log("TotalTime: ", "" + totalTime);
 				
 			}
-		}
+		
+		}*/
 		
 		
-		
-		skeleton.updateWorldTransform();
-
-		
+		skeleton.updateWorldTransform();	
 	}
 	
+	public float getPositionX(){
+		return root.getX();
+	}
+	
+	public boolean isRight(){
+		return right;
+	}
 }

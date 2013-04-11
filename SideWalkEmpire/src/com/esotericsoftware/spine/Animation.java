@@ -1,3 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2013, Esoteric Software
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
 
 package com.esotericsoftware.spine;
 
@@ -6,11 +30,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 public class Animation {
+	final String name;
 	private final Array<Timeline> timelines;
 	private float duration;
 
-	public Animation (Array<Timeline> timelines, float duration) {
+	public Animation (String name, Array<Timeline> timelines, float duration) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
+		this.name = name;
 		this.timelines = timelines;
 		this.duration = duration;
 	}
@@ -19,8 +46,7 @@ public class Animation {
 		return timelines;
 	}
 
-	/** Returns the duration of the animation in seconds. Defaults to the max {@link Timeline#getDuration() duration} of the
-	 * timelines. */
+	/** Returns the duration of the animation in seconds. */
 	public float getDuration () {
 		return duration;
 	}
@@ -52,6 +78,14 @@ public class Animation {
 			timelines.get(i).apply(skeleton, time, alpha);
 	}
 
+	public String getName () {
+		return name;
+	}
+
+	public String toString () {
+		return name;
+	}
+
 	/** @param target After the first and before the last entry. */
 	static int binarySearch (float[] values, float target, int step) {
 		int low = 0;
@@ -76,13 +110,7 @@ public class Animation {
 		return -1;
 	}
 
-	/** The keyframes for a single animation timeline. */
 	static public interface Timeline {
-		/** Returns the time in seconds of the last keyframe. */
-		public float getDuration ();
-
-		public int getKeyframeCount ();
-
 		/** Sets the value(s) for the specified time. */
 		public void apply (Skeleton skeleton, float time, float alpha);
 	}
@@ -95,22 +123,26 @@ public class Animation {
 
 		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
 
-		public CurveTimeline (int keyframeCount) {
-			curves = new float[(keyframeCount - 1) * 6];
+		public CurveTimeline (int frameCount) {
+			curves = new float[(frameCount - 1) * 6];
 		}
 
-		public void setLinear (int keyframeIndex) {
-			curves[keyframeIndex * 6] = LINEAR;
+		public int getFrameCount () {
+			return curves.length / 6 + 1;
 		}
 
-		public void setStepped (int keyframeIndex) {
-			curves[keyframeIndex * 6] = STEPPED;
+		public void setLinear (int frameIndex) {
+			curves[frameIndex * 6] = LINEAR;
+		}
+
+		public void setStepped (int frameIndex) {
+			curves[frameIndex * 6] = STEPPED;
 		}
 
 		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
 		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 		 * the difference between the keyframe's values. */
-		public void setCurve (int keyframeIndex, float cx1, float cy1, float cx2, float cy2) {
+		public void setCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
 			float subdiv_step = 1f / BEZIER_SEGMENTS;
 			float subdiv_step2 = subdiv_step * subdiv_step;
 			float subdiv_step3 = subdiv_step2 * subdiv_step;
@@ -122,7 +154,7 @@ public class Animation {
 			float tmp1y = -cy1 * 2 + cy2;
 			float tmp2x = (cx1 - cx2) * 3 + 1;
 			float tmp2y = (cy1 - cy2) * 3 + 1;
-			int i = keyframeIndex * 6;
+			int i = frameIndex * 6;
 			float[] curves = this.curves;
 			curves[i] = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3;
 			curves[i + 1] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
@@ -132,8 +164,8 @@ public class Animation {
 			curves[i + 5] = tmp2y * pre5;
 		}
 
-		public float getCurvePercent (int keyframeIndex, float percent) {
-			int curveIndex = keyframeIndex * 6;
+		public float getCurvePercent (int frameIndex, float percent) {
+			int curveIndex = frameIndex * 6;
 			float[] curves = this.curves;
 			float dfx = curves[curveIndex];
 			if (dfx == LINEAR) return percent;
@@ -171,17 +203,9 @@ public class Animation {
 		private int boneIndex;
 		private final float[] frames; // time, value, ...
 
-		public RotateTimeline (int keyframeCount) {
-			super(keyframeCount);
-			frames = new float[keyframeCount * 2];
-		}
-
-		public float getDuration () {
-			return frames[frames.length - 2];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 2;
+		public RotateTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 2];
 		}
 
 		public void setBoneIndex (int boneIndex) {
@@ -192,15 +216,15 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public float[] getKeyframes () {
+		public float[] getFrames () {
 			return frames;
 		}
 
 		/** Sets the time and value of the specified keyframe. */
-		public void setKeyframe (int keyframeIndex, float time, float value) {
-			keyframeIndex *= 2;
-			frames[keyframeIndex] = time;
-			frames[keyframeIndex + 1] = value;
+		public void setFrame (int frameIndex, float time, float value) {
+			frameIndex *= 2;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = value;
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {
@@ -248,17 +272,9 @@ public class Animation {
 		int boneIndex;
 		final float[] frames; // time, value, value, ...
 
-		public TranslateTimeline (int keyframeCount) {
-			super(keyframeCount);
-			frames = new float[keyframeCount * 3];
-		}
-
-		public float getDuration () {
-			return frames[frames.length - 3];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 3;
+		public TranslateTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 3];
 		}
 
 		public void setBoneIndex (int boneIndex) {
@@ -269,16 +285,16 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public float[] getKeyframes () {
+		public float[] getFrames () {
 			return frames;
 		}
 
 		/** Sets the time and value of the specified keyframe. */
-		public void setKeyframe (int keyframeIndex, float time, float x, float y) {
-			keyframeIndex *= 3;
-			frames[keyframeIndex] = time;
-			frames[keyframeIndex + 1] = x;
-			frames[keyframeIndex + 2] = y;
+		public void setFrame (int frameIndex, float time, float x, float y) {
+			frameIndex *= 3;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = x;
+			frames[frameIndex + 2] = y;
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {
@@ -307,8 +323,8 @@ public class Animation {
 	}
 
 	static public class ScaleTimeline extends TranslateTimeline {
-		public ScaleTimeline (int keyframeCount) {
-			super(keyframeCount);
+		public ScaleTimeline (int frameCount) {
+			super(frameCount);
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {
@@ -347,17 +363,9 @@ public class Animation {
 		private int slotIndex;
 		private final float[] frames; // time, r, g, b, a, ...
 
-		public ColorTimeline (int keyframeCount) {
-			super(keyframeCount);
-			frames = new float[keyframeCount * 5];
-		}
-
-		public float getDuration () {
-			return frames[frames.length - 5];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 5;
+		public ColorTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 5];
 		}
 
 		public void setSlotIndex (int slotIndex) {
@@ -368,18 +376,18 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public float[] getKeyframes () {
+		public float[] getFrames () {
 			return frames;
 		}
 
 		/** Sets the time and value of the specified keyframe. */
-		public void setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a) {
-			keyframeIndex *= 5;
-			frames[keyframeIndex] = time;
-			frames[keyframeIndex + 1] = r;
-			frames[keyframeIndex + 2] = g;
-			frames[keyframeIndex + 3] = b;
-			frames[keyframeIndex + 4] = a;
+		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
+			frameIndex *= 5;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = r;
+			frames[frameIndex + 2] = g;
+			frames[frameIndex + 3] = b;
+			frames[frameIndex + 4] = a;
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {
@@ -424,16 +432,12 @@ public class Animation {
 		private final float[] frames; // time, ...
 		private final String[] attachmentNames;
 
-		public AttachmentTimeline (int keyframeCount) {
-			frames = new float[keyframeCount];
-			attachmentNames = new String[keyframeCount];
+		public AttachmentTimeline (int frameCount) {
+			frames = new float[frameCount];
+			attachmentNames = new String[frameCount];
 		}
 
-		public float getDuration () {
-			return frames[frames.length - 1];
-		}
-
-		public int getKeyframeCount () {
+		public int getFrameCount () {
 			return frames.length;
 		}
 
@@ -445,7 +449,7 @@ public class Animation {
 			this.slotIndex = slotIndex;
 		}
 
-		public float[] getKeyframes () {
+		public float[] getFrames () {
 			return frames;
 		}
 
@@ -454,9 +458,9 @@ public class Animation {
 		}
 
 		/** Sets the time and value of the specified keyframe. */
-		public void setKeyframe (int keyframeIndex, float time, String attachmentName) {
-			frames[keyframeIndex] = time;
-			attachmentNames[keyframeIndex] = attachmentName;
+		public void setFrame (int frameIndex, float time, String attachmentName) {
+			frames[frameIndex] = time;
+			attachmentNames[frameIndex] = attachmentName;
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {

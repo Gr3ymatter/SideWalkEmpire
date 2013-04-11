@@ -1,3 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2013, Esoteric Software
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
 
 package com.esotericsoftware.spine;
 
@@ -11,13 +35,14 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
+import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.SerializationException;
 
 import java.io.IOException;
@@ -33,11 +58,13 @@ public class SkeletonBinary {
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
+	static private final Color tempColor = new Color();
+
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
 
 	public SkeletonBinary (TextureAtlas atlas) {
-		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
+		attachmentLoader = new AtlasAttachmentLoader(atlas);
 	}
 
 	public SkeletonBinary (AttachmentLoader attachmentLoader) {
@@ -57,6 +84,8 @@ public class SkeletonBinary {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
+		skeletonData.setName(file.nameWithoutExtension());
+
 		DataInput input = new DataInput(file.read(512));
 		try {
 			// Bones.
@@ -100,6 +129,10 @@ public class SkeletonBinary {
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skeletonData.addSkin(readSkin(input, input.readString()));
+
+			// Animations.
+			for (int i = 0, n = input.readInt(true); i < n; i++)
+				readAnimation(input.readString(), input, skeletonData);
 
 			input.close();
 		} catch (IOException ex) {
@@ -155,19 +188,15 @@ public class SkeletonBinary {
 		return attachment;
 	}
 
-	public Animation readAnimation (FileHandle file, SkeletonData skeleton) {
-		if (file == null) throw new IllegalArgumentException("file cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
+	private void readAnimation (String name, DataInput input, SkeletonData skeletonData) {
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
-		DataInput input = new DataInput(file.read(512));
 		try {
 			int boneCount = input.readInt(true);
 			for (int i = 0; i < boneCount; i++) {
 				String boneName = input.readString();
-				int boneIndex = skeleton.findBoneIndex(boneName);
+				int boneIndex = skeletonData.findBoneIndex(boneName);
 				if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
@@ -178,11 +207,11 @@ public class SkeletonBinary {
 						RotateTimeline timeline = new RotateTimeline(keyCount);
 						timeline.setBoneIndex(boneIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readFloat());
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat());
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 2 - 2]);
 						break;
 					}
 					case TIMELINE_TRANSLATE:
@@ -197,12 +226,12 @@ public class SkeletonBinary {
 						}
 						timeline.setBoneIndex(boneIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
 								* timelineScale);
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 3 - 3]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a bone: " + timelineType + " (" + boneName + ")");
@@ -213,7 +242,7 @@ public class SkeletonBinary {
 			int slotCount = input.readInt(true);
 			for (int i = 0; i < slotCount; i++) {
 				String slotName = input.readString();
-				int slotIndex = skeleton.findSlotIndex(slotName);
+				int slotIndex = skeletonData.findSlotIndex(slotName);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
 					int timelineType = input.readByte();
@@ -224,21 +253,21 @@ public class SkeletonBinary {
 						timeline.setSlotIndex(slotIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
 							float time = input.readFloat();
-							Color.rgba8888ToColor(Color.tmp, input.readInt());
-							timeline.setKeyframe(keyframeIndex, time, Color.tmp.r, Color.tmp.g, Color.tmp.b, Color.tmp.a);
+							Color.rgba8888ToColor(tempColor, input.readInt());
+							timeline.setFrame(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 5 - 5]);
 						break;
 					}
 					case TIMELINE_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(keyCount);
 						timeline.setSlotIndex(slotIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++)
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readString());
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[keyCount - 1]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");
@@ -250,7 +279,7 @@ public class SkeletonBinary {
 		}
 
 		timelines.shrink();
-		return new Animation(timelines, duration);
+		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (DataInput input, int keyframeIndex, CurveTimeline timeline) throws IOException {

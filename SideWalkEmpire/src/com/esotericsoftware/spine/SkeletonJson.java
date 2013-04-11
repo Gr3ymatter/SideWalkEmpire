@@ -1,3 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2013, Esoteric Software
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
 
 package com.esotericsoftware.spine;
 
@@ -11,7 +35,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
+import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -21,6 +45,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.SerializationException;
+
+import java.io.StringWriter;
 
 public class SkeletonJson {
 	static public final String TIMELINE_SCALE = "scale";
@@ -34,7 +60,7 @@ public class SkeletonJson {
 	private float scale = 1;
 
 	public SkeletonJson (TextureAtlas atlas) {
-		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
+		attachmentLoader = new AtlasAttachmentLoader(atlas);
 	}
 
 	public SkeletonJson (AttachmentLoader attachmentLoader) {
@@ -54,6 +80,7 @@ public class SkeletonJson {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
+		skeletonData.setName(file.nameWithoutExtension());
 
 		OrderedMap<String, ?> root = json.fromJson(OrderedMap.class, file);
 
@@ -111,9 +138,17 @@ public class SkeletonJson {
 			}
 		}
 
+		// Animations.
+		OrderedMap<String, OrderedMap> animationMap = (OrderedMap)root.get("animations");
+		if (animationMap != null) {
+			for (Entry<String, OrderedMap> entry : animationMap.entries())
+				readAnimation(entry.key, entry.value, skeletonData);
+		}
+
 		skeletonData.bones.shrink();
 		skeletonData.slots.shrink();
 		skeletonData.skins.shrink();
+		skeletonData.animations.shrink();
 		return skeletonData;
 	}
 
@@ -155,64 +190,61 @@ public class SkeletonJson {
 		return (Float)value;
 	}
 
-	public Animation readAnimation (FileHandle file, SkeletonData skeletonData) {
-		if (file == null) throw new IllegalArgumentException("file cannot be null.");
-		if (skeletonData == null) throw new IllegalArgumentException("skeletonData cannot be null.");
-
-		OrderedMap<String, ?> map = json.fromJson(OrderedMap.class, file);
-
+	private void readAnimation (String name, OrderedMap<String, ?> map, SkeletonData skeletonData) {
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
 		OrderedMap<String, ?> bonesMap = (OrderedMap)map.get("bones");
-		for (Entry<String, ?> entry : bonesMap.entries()) {
-			String boneName = entry.key;
-			int boneIndex = skeletonData.findBoneIndex(boneName);
-			if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
+		if (bonesMap != null) {
+			for (Entry<String, ?> entry : bonesMap.entries()) {
+				String boneName = entry.key;
+				int boneIndex = skeletonData.findBoneIndex(boneName);
+				if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
 
-			OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
-			for (Entry timelineEntry : timelineMap.entries()) {
-				Array<OrderedMap> values = (Array)timelineEntry.value;
-				String timelineName = (String)timelineEntry.key;
-				if (timelineName.equals(TIMELINE_ROTATE)) {
-					RotateTimeline timeline = new RotateTimeline(values.size);
-					timeline.setBoneIndex(boneIndex);
+				OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
+				for (Entry timelineEntry : timelineMap.entries()) {
+					Array<OrderedMap> values = (Array)timelineEntry.value;
+					String timelineName = (String)timelineEntry.key;
+					if (timelineName.equals(TIMELINE_ROTATE)) {
+						RotateTimeline timeline = new RotateTimeline(values.size);
+						timeline.setBoneIndex(boneIndex);
 
-					int keyframeIndex = 0;
-					for (OrderedMap valueMap : values) {
-						float time = (Float)valueMap.get("time");
-						timeline.setKeyframe(keyframeIndex, time, (Float)valueMap.get("angle"));
-						readCurve(timeline, keyframeIndex, valueMap);
-						keyframeIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getDuration());
+						int keyframeIndex = 0;
+						for (OrderedMap valueMap : values) {
+							float time = (Float)valueMap.get("time");
+							timeline.setFrame(keyframeIndex, time, (Float)valueMap.get("angle"));
+							readCurve(timeline, keyframeIndex, valueMap);
+							keyframeIndex++;
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 
-				} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
-					TranslateTimeline timeline;
-					float timelineScale = 1;
-					if (timelineName.equals(TIMELINE_SCALE))
-						timeline = new ScaleTimeline(values.size);
-					else {
-						timeline = new TranslateTimeline(values.size);
-						timelineScale = scale;
-					}
-					timeline.setBoneIndex(boneIndex);
+					} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
+						TranslateTimeline timeline;
+						float timelineScale = 1;
+						if (timelineName.equals(TIMELINE_SCALE))
+							timeline = new ScaleTimeline(values.size);
+						else {
+							timeline = new TranslateTimeline(values.size);
+							timelineScale = scale;
+						}
+						timeline.setBoneIndex(boneIndex);
 
-					int keyframeIndex = 0;
-					for (OrderedMap valueMap : values) {
-						float time = (Float)valueMap.get("time");
-						Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
-						timeline.setKeyframe(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
-							: (y * timelineScale));
-						readCurve(timeline, keyframeIndex, valueMap);
-						keyframeIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getDuration());
+						int keyframeIndex = 0;
+						for (OrderedMap valueMap : values) {
+							float time = (Float)valueMap.get("time");
+							Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
+							timeline.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
+								: (y * timelineScale));
+							readCurve(timeline, keyframeIndex, valueMap);
+							keyframeIndex++;
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 
-				} else
-					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+					} else
+						throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+				}
 			}
 		}
 
@@ -234,12 +266,12 @@ public class SkeletonJson {
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
 							Color color = Color.valueOf((String)valueMap.get("color"));
-							timeline.setKeyframe(keyframeIndex, time, color.r, color.g, color.b, color.a);
+							timeline.setFrame(keyframeIndex, time, color.r, color.g, color.b, color.a);
 							readCurve(timeline, keyframeIndex, valueMap);
 							keyframeIndex++;
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
 
 					} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
 						AttachmentTimeline timeline = new AttachmentTimeline(values.size);
@@ -248,10 +280,10 @@ public class SkeletonJson {
 						int keyframeIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
-							timeline.setKeyframe(keyframeIndex++, time, (String)valueMap.get("name"));
+							timeline.setFrame(keyframeIndex++, time, (String)valueMap.get("name"));
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 
 					} else
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
@@ -260,7 +292,7 @@ public class SkeletonJson {
 		}
 
 		timelines.shrink();
-		return new Animation(timelines, duration);
+		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (CurveTimeline timeline, int keyframeIndex, OrderedMap valueMap) {
