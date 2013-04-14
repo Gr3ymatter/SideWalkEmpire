@@ -70,13 +70,13 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		stage.act(delta);
 		
-		stage.draw();
+		stage.draw();		
 		
 		if(TimeUtils.millis() - lastPersonTime > 5000)
 				spawnRandomPeople();
 
 		for(int i = 0; i< randomPeople.size; i++){
-			if(randomPeople.get(i).getPositionX() >= 480 && !randomPeople.get(i).isRight()){
+			if(randomPeople.get(i).getPositionX() >= 490 && !randomPeople.get(i).isRight()){
 				randomPeople.get(i).remove();
 				randomPeople.removeIndex(i);
 		}else if(randomPeople.get(i).getPositionX()<= 0 && randomPeople.get(i).isRight()){
@@ -84,12 +84,16 @@ public class GameScreen implements Screen {
 			randomPeople.removeIndex(i);
 			}
 		}
+		
+	//	Gdx.app.log("DEBUG", "randomPeopleSize: " + randomPeople.size);
+
 		if(TimeUtils.millis() - beginTime > 3000){
 			Gdx.app.log("DEBUG", " BING! ");
 			makeCustomer(store);
 			beginTime = TimeUtils.millis();
 		}
 		
+	
 		//Gdx.app.log("Debug", "" + randomPeople.size);	
 		
 		//Gdx.app.log("People ", "" + randomPeople.size);
@@ -118,17 +122,18 @@ public class GameScreen implements Screen {
 		image.setSize(480, 600);
 		image.setPosition(0, 170);
 		
-		Image cartImage = new Image(new Texture(Gdx.files.internal("data/cart.png")));
-		cartImage.setScale(.65f, .65f);
-		cartImage.setPosition(175, 300);
+		Image cartImage = new Image(new Texture(Gdx.files.internal("data/coffeecart.png")));
+		cartImage.setScale(.4f, .4f);
+		cartImage.setPosition(180, 300);
 		
 		//Gdx.app.log("Image", "Stage Width:" + stage.getWidth() + " Stage Height: " + stage.getHeight());
 		stage.addActor(image);
+
 		stage.addActor(cartImage);
+		stage.addActor(tee);
 
 		stage.addActor(menu);
-	//	stage.addActor(tee);
-	//	spawnRandomPeople();
+    	spawnRandomPeople();
 
 	}
 
@@ -161,20 +166,30 @@ public class GameScreen implements Screen {
 	private void spawnRandomPeople(){
 	
 		int x = -10;
-		int y = MathUtils.random(200, 299);
+		int y = MathUtils.random(230, 299);
 		int z = 1;
 		int rand = MathUtils.random(0,1);
+		int type = MathUtils.random(0, 2);
+		
+		Person person = new Person(x, y, rand, type);
+		Gdx.app.log("DEBUG", " rand: " + rand);
+				
+		
+		randomPeople.add(person);
+
+		stage.addActor(person);
 		
 		for(int i = 0; i<randomPeople.size; i++)
 		{
-			if(randomPeople.get(i).getY() > y)
-				randomPeople.get(i).toBack();
+			Gdx.app.log("DEBUG", "In for loop");
+			if(randomPeople.get(i).root.getY() < y){
+				Gdx.app.log("getY: ", "" + randomPeople.get(i).root.getY());
+				Gdx.app.log("y", "" + y);
+				randomPeople.get(i).toFront();
+			   Gdx.app.log("Debug", "Sent to back?: Yes");
+			}
 		}
-		Person person = new Person(x, y, rand);
 		
-		randomPeople.add(person);
-		
-		stage.addActor(person);
 		lastPersonTime = TimeUtils.millis();
 	}
 	
@@ -189,15 +204,20 @@ public class GameScreen implements Screen {
 			Hippie hippie = new Hippie();
 			custList.add(hippie);
 			stage.addActor(hippie);
+			Gdx.app.log("Hippie Created", "");
 			
 		}else if(custType.equals("Laborer")){
 			Laborer laborer = new Laborer();
 			custList.add(laborer);
 			stage.addActor(laborer);
+			Gdx.app.log("Laborer Created", "");
+			
 		}else if(custType.equals("Student")){
 			Student student = new Student();
 			custList.add(student);
 			stage.addActor(student);
+			Gdx.app.log("Student Created", "");
+
 		}else if(custType.equals("Businessman")){
 			Businessman businessman = new Businessman(); 
 			custList.add(businessman);
@@ -245,5 +265,9 @@ public class GameScreen implements Screen {
 			
 		}
 
+	
+	
+	
+	
 	
 }

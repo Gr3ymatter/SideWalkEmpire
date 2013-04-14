@@ -362,6 +362,7 @@ public class Store {
 		determinePreference(cust);
 		convertCustomer(cust);
 		if (cust.getConverted()) makePurchase(cust);
+		cust.setProcessed(true);
 
 		}
 

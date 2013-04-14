@@ -31,7 +31,7 @@ public class Menu extends Actor {
 	
 	@Override
 	public void draw(SpriteBatch batch, float parentAlpha) {
-		batch.draw(Assets.menuRegion, 0, 0, Gdx.graphics.getWidth(), menuBounds.getHeight());
+		//batch.draw(Assets.menuRegion, 0, 0, Gdx.graphics.getWidth(), menuBounds.getHeight());
 		menuButton.draw(batch, parentAlpha);
 		exitButton.draw(batch, parentAlpha);
 	}

@@ -5,107 +5,191 @@ filter: Nearest,Nearest
 repeat: none
 laborerBody
   rotate: false
-  xy: 1, 480
+  xy: 1, 483
   size: 393, 540
   orig: 393, 540
   offset: 0, 0
   index: -1
-teeBody
-  rotate: false
-  xy: 1, 220
-  size: 273, 258
-  orig: 273, 258
-  offset: 0, 0
-  index: -1
 studentBody
   rotate: false
-  xy: 276, 44
+  xy: 1, 47
   size: 280, 434
   orig: 280, 434
   offset: 0, 0
   index: -1
-laborerRLArm
+laborerHead
   rotate: false
-  xy: 1, 7
-  size: 137, 211
-  orig: 137, 211
+  xy: 396, 706
+  size: 280, 317
+  orig: 280, 317
   offset: 0, 0
   index: -1
-teeRArm
+teeBody
   rotate: false
-  xy: 140, 50
-  size: 127, 168
-  orig: 127, 168
-  offset: 0, 0
-  index: -1
-techieBody
-  rotate: false
-  xy: 396, 510
-  size: 397, 510
-  orig: 397, 510
+  xy: 678, 765
+  size: 273, 258
+  orig: 273, 258
   offset: 0, 0
   index: -1
 laborerLLLeg
   rotate: false
-  xy: 558, 154
+  xy: 283, 127
   size: 207, 354
   orig: 207, 354
   offset: 0, 0
   index: -1
-teeArm
-  rotate: false
-  xy: 558, 1
-  size: 138, 151
-  orig: 138, 151
-  offset: 0, 0
-  index: -1
-techieRLLeg
-  rotate: false
-  xy: 767, 214
-  size: 252, 294
-  orig: 252, 294
-  offset: 0, 0
-  index: -1
 laborerLUArm
   rotate: false
-  xy: 767, 5
+  xy: 396, 497
   size: 174, 207
   orig: 174, 207
   offset: 0, 0
   index: -1
-studentLUArm
+laborerRLLeg
   rotate: false
-  xy: 943, 25
-  size: 79, 187
-  orig: 79, 187
+  xy: 492, 142
+  size: 204, 353
+  orig: 204, 353
+  offset: 0, 0
+  index: -1
+laborerLLArm
+  rotate: false
+  xy: 572, 497
+  size: 136, 207
+  orig: 136, 207
   offset: 0, 0
   index: -1
 studentHead
   rotate: false
-  xy: 795, 757
+  xy: 710, 500
   size: 219, 263
   orig: 219, 263
   offset: 0, 0
   index: -1
-studentLULeg
+studentRLLeg
   rotate: false
-  xy: 795, 512
-  size: 105, 243
-  orig: 105, 243
+  xy: 698, 211
+  size: 170, 284
+  orig: 170, 284
+  offset: 0, 0
+  index: -1
+laborerLULeg
+  rotate: false
+  xy: 870, 248
+  size: 153, 250
+  orig: 153, 250
+  offset: 0, 0
+  index: -1
+teeHead
+  rotate: false
+  xy: 931, 663
+  size: 92, 100
+  orig: 92, 100
+  offset: 0, 0
+  index: -1
+teeArm
+  rotate: false
+  xy: 698, 58
+  size: 138, 151
+  orig: 138, 151
   offset: 0, 0
   index: -1
 laborerRHand
   rotate: false
-  xy: 902, 654
+  xy: 283, 24
   size: 118, 101
   orig: 118, 101
   offset: 0, 0
   index: -1
-studentRHand
+laborerLHand
   rotate: false
-  xy: 902, 557
-  size: 117, 95
-  orig: 117, 95
+  xy: 403, 22
+  size: 114, 103
+  orig: 114, 103
+  offset: 0, 0
+  index: -1
+techieBody
+  rotate: false
+  xy: 519, 11
+  size: 104, 129
+  orig: 104, 129
+  offset: 0, 0
+  index: -1
+laborerRUArm
+  rotate: false
+  xy: 870, 18
+  size: 152, 228
+  orig: 152, 228
+  offset: 0, 0
+  index: -1
+techieHead
+  rotate: false
+  xy: 931, 579
+  size: 73, 82
+  orig: 73, 82
+  offset: 0, 0
+  index: -1
+techieRLLeg
+  rotate: false
+  xy: 953, 938
+  size: 64, 85
+  orig: 64, 85
+  offset: 0, 0
+  index: -1
+studentHand
+  rotate: false
+  xy: 931, 512
+  size: 84, 65
+  orig: 84, 65
+  offset: 0, 0
+  index: -1
+techieLLLeg
+  rotate: false
+  xy: 625, 65
+  size: 63, 75
+  orig: 63, 75
+  offset: 0, 0
+  index: -1
+techieLLArm
+  rotate: false
+  xy: 1, 1
+  size: 37, 44
+  orig: 37, 44
+  offset: 0, 0
+  index: -1
+techieRULeg
+  rotate: false
+  xy: 953, 868
+  size: 51, 68
+  orig: 51, 68
+  offset: 0, 0
+  index: -1
+techieLUArm
+  rotate: false
+  xy: 953, 797
+  size: 47, 69
+  orig: 47, 69
+  offset: 0, 0
+  index: -1
+techieRLArm
+  rotate: false
+  xy: 625, 12
+  size: 49, 51
+  orig: 49, 51
+  offset: 0, 0
+  index: -1
+techieRHand
+  rotate: false
+  xy: 678, 743
+  size: 30, 20
+  orig: 30, 20
+  offset: 0, 0
+  index: -1
+techieLHand
+  rotate: false
+  xy: 40, 23
+  size: 34, 22
+  orig: 34, 22
   offset: 0, 0
   index: -1
 
@@ -113,183 +197,94 @@ cust2.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-laborerHead
-  rotate: false
-  xy: 1, 690
-  size: 280, 317
-  orig: 280, 317
-  offset: 0, 0
-  index: -1
-techieHead
-  rotate: false
-  xy: 283, 703
-  size: 285, 304
-  orig: 285, 304
-  offset: 0, 0
-  index: -1
-laborerRLLeg
-  rotate: false
-  xy: 1, 335
-  size: 204, 353
-  orig: 204, 353
-  offset: 0, 0
-  index: -1
-techieLLLeg
-  rotate: false
-  xy: 570, 711
-  size: 258, 296
-  orig: 258, 296
-  offset: 0, 0
-  index: -1
-techieRULeg
-  rotate: false
-  xy: 1, 73
-  size: 206, 260
-  orig: 206, 260
-  offset: 0, 0
-  index: -1
-studentRLLeg
-  rotate: false
-  xy: 830, 723
-  size: 170, 284
-  orig: 170, 284
-  offset: 0, 0
-  index: -1
-studentLLLeg
-  rotate: false
-  xy: 207, 410
-  size: 147, 278
-  orig: 147, 278
-  offset: 0, 0
-  index: -1
-techieLUArm
-  rotate: false
-  xy: 356, 455
-  size: 184, 246
-  orig: 184, 246
-  offset: 0, 0
-  index: -1
 laborerRULeg
   rotate: false
-  xy: 209, 153
+  xy: 1, 256
   size: 173, 255
   orig: 173, 255
   offset: 0, 0
   index: -1
-techieLULeg
-  rotate: false
-  xy: 384, 199
-  size: 168, 254
-  orig: 168, 254
-  offset: 0, 0
-  index: -1
-techieRUArm
-  rotate: false
-  xy: 542, 466
-  size: 171, 235
-  orig: 171, 235
-  offset: 0, 0
-  index: -1
-laborerLULeg
-  rotate: false
-  xy: 554, 214
-  size: 153, 250
-  orig: 153, 250
-  offset: 0, 0
-  index: -1
 studentRULeg
   rotate: false
-  xy: 715, 456
+  xy: 1, 1
   size: 110, 253
   orig: 110, 253
   offset: 0, 0
   index: -1
-laborerRUArm
+studentLLLeg
   rotate: false
-  xy: 709, 226
-  size: 152, 228
-  orig: 152, 228
+  xy: 176, 233
+  size: 147, 278
+  orig: 147, 278
   offset: 0, 0
   index: -1
-techieLHand
+laborerRLArm
   rotate: false
-  xy: 209, 52
-  size: 141, 99
-  orig: 141, 99
+  xy: 325, 300
+  size: 137, 211
+  orig: 137, 211
   offset: 0, 0
   index: -1
-techieRLArm
+studentLULeg
   rotate: false
-  xy: 384, 1
-  size: 174, 196
-  orig: 174, 196
-  offset: 0, 0
-  index: -1
-laborerLLArm
-  rotate: false
-  xy: 560, 5
-  size: 136, 207
-  orig: 136, 207
+  xy: 464, 268
+  size: 105, 243
+  orig: 105, 243
   offset: 0, 0
   index: -1
 studentRUArm
   rotate: false
-  xy: 698, 14
+  xy: 571, 313
   size: 100, 198
   orig: 100, 198
   offset: 0, 0
   index: -1
-techieLLArm
+teeRArm
   rotate: false
-  xy: 800, 53
-  size: 150, 171
-  orig: 150, 171
+  xy: 673, 343
+  size: 127, 168
+  orig: 127, 168
   offset: 0, 0
   index: -1
 studentRLArm
   rotate: false
-  xy: 827, 547
+  xy: 802, 349
   size: 111, 162
   orig: 111, 162
   offset: 0, 0
   index: -1
-techieRHand
+studentLUArm
   rotate: false
-  xy: 827, 458
-  size: 122, 87
-  orig: 122, 87
+  xy: 915, 324
+  size: 79, 187
+  orig: 79, 187
   offset: 0, 0
   index: -1
 studentLLArm
   rotate: false
-  xy: 863, 297
+  xy: 113, 72
   size: 113, 159
   orig: 113, 159
   offset: 0, 0
   index: -1
-studentHand
+studentRHand
   rotate: false
-  xy: 1, 6
-  size: 84, 65
-  orig: 84, 65
+  xy: 228, 136
+  size: 117, 95
+  orig: 117, 95
   offset: 0, 0
   index: -1
-
-cust3.png
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-laborerLHand
+techieLULeg
   rotate: false
-  xy: 1, 1
-  size: 114, 103
-  orig: 114, 103
+  xy: 113, 9
+  size: 45, 61
+  orig: 45, 61
   offset: 0, 0
   index: -1
-teeHead
+techieRUArm
   rotate: false
-  xy: 117, 4
-  size: 92, 100
-  orig: 92, 100
+  xy: 325, 238
+  size: 43, 60
+  orig: 43, 60
   offset: 0, 0
   index: -1

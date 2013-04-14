@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.esotericsoftware.spine.Animation;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
 
 public class Customer extends Actor {
 // This class will contain common character variables and methods & animation methods for characters 
@@ -16,9 +19,15 @@ public class Customer extends Actor {
 	protected float customerPreference; // after preference is determined in store method, store value here?
 	protected String type;
 	protected ArrayList<String> purchasedItems;
+	protected boolean processed;
 
+	
+	public Bone root;
+	public Skeleton skeleton;
+	public Animation walkAnimation;
 	protected int positionX;
 	protected int positionY;
+	float totalTime;
 	
 	Customer(){
 		// Only consistent aspect is name across customer constructors
@@ -26,28 +35,38 @@ public class Customer extends Actor {
 		purchasedItems = new ArrayList<String>();
 		//Placeholder constructor
 		positionX = -10;
-		positionY = 290;
+		positionY = 315;
 	}
-	
-	
 	
 
 	@Override
 	public void draw(SpriteBatch batch, float parentAlpha) {
 		// TODO Auto-generated method stub
-		super.draw(batch, parentAlpha);
-		
+		//super.draw(batch, parentAlpha);
+		skeleton.draw(batch);
 	}
-
-
 
 
 	@Override
 	public void act(float delta) {
 		// TODO Auto-generated method stub
 		super.act(delta);
+		totalTime += delta;
 		
+		if(root.getX() >= 165 && !(getProcessed())){
+			
+			//Stop
+			
+			
+		}else{
+			
+			walkAnimation.apply(skeleton, totalTime, true);
+			root.setX(positionX++);
+			if(root.getX() >= 490)
+				this.remove();
+		}
 		
+		skeleton.updateWorldTransform();
 	}
 
 
@@ -78,6 +97,15 @@ public class Customer extends Actor {
 	public boolean getConverted(){
 		return converted;
 		}
+	
+	public void setProcessed(boolean proc){
+		processed = proc;
+		}
+
+	public boolean getProcessed(){
+		return processed;
+		}
+
 
 	public void setPurchase(float purch){
 		purchase = purch;

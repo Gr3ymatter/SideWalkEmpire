@@ -1,25 +1,31 @@
 package Models;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.SkeletonData;
 
 public class Tee extends Actor{
 
 	Bone root;
+	SkeletonData skeletonData;
 	Skeleton skeleton;
+	Animation animation;
 	float totalTime;
 	
 
 	public Tee (){
-		skeleton = Assets.teeSkeleton;
+		skeletonData = Assets.teeSkeletonData;
+		skeleton = new Skeleton(skeletonData);
+		animation = Assets.teeWaveAnimation;
 		root = skeleton.getRootBone();
-		root.setX(280);
-		root.setY(545);
-		root.setScaleX(.5f);
-		root.setScaleY(.5f);
+		skeleton.setFlipX(true);
+		root.setX(250);
+		root.setY(380);
+		root.setScaleX(.15f);
+		root.setScaleY(.15f);
 		skeleton.updateWorldTransform();
 		
 	}
@@ -30,7 +36,7 @@ public class Tee extends Actor{
 		
 		skeleton.draw(batch);
 		
-		batch.draw(Assets.cartRegion, 250, 500, Assets.cartRegion.getRegionWidth()/2, Assets.cartRegion.getRegionHeight()/2);
+	//.draw(Assets.cartRegion, 250, 500, Assets.cartRegion.getRegionWidth()/2, Assets.cartRegion.getRegionHeight()/2);
 		
 	}
 
@@ -41,20 +47,7 @@ public class Tee extends Actor{
 		
 	//	Gdx.app.log("Message", "Time: " + totalTime);
 		
-	
-		Assets.teeSwayAnimation.apply(skeleton, totalTime, true);
-		if (totalTime > 5) {
-			float waveTime = totalTime - 5f;
-			
-			float mixTime = 10f;
-			if (waveTime > mixTime)
-				Assets.teeWaveAnimation.apply(skeleton, waveTime, true);
-			else
-				Assets.teeWaveAnimation.mix(skeleton, waveTime, true, waveTime / mixTime);
-			if (totalTime > 10.6) totalTime = 0;
-		}
-	
-	//	Assets.teeWaveAnimation.apply(skeleton, totalTime, true);
+		animation.apply(skeleton, totalTime, true);
 
 		skeleton.updateWorldTransform();
 		

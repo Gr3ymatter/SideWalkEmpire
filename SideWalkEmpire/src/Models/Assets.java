@@ -16,48 +16,43 @@ public class Assets {
 	
 	public static TextureRegion menuRegion;
 	public static TextureRegion cartRegion;
-	public static Skeleton teeSkeleton;
 	public static Animation teeWaveAnimation;
-	public static Animation teeSwayAnimation;
-	public static Skeleton customerSkeleton;
 	public static Animation customerWalkingAnimation;
 	public static Animation customerIdleAnimation;
 	public static SkeletonBinary skelBinary;
 	public static SkeletonData skeletonData;
-	public static Skeleton techieSkeleton;
+	public static SkeletonData teeSkeletonData;
+	public static SkeletonData techieSkeletonData;
+	public static SkeletonData laborerSkeletonData;
+	public static SkeletonData studentSkeletonData;
+	public static Animation techieWalkAnimation;
+	public static Animation laborerWalkAnimation;
+	public static Animation studentWalkAnimation;
 	public static Skin skin;
-	public static Array <Animation> animArray;
 
+	
 	public  static void load(){
 		
 		atlas = new TextureAtlas(Gdx.files.internal("data/cust.pack"));
 		
-		menuRegion = atlas.findRegion("menu_toolbar");
+		//menuRegion = atlas.findRegion("menu_toolbar");
 		cartRegion = atlas.findRegion("shack");
 			
 		skelBinary = new SkeletonBinary(atlas);
-		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/techie.skel"));
-		techieSkeleton = new Skeleton(skeletonData);
-		animArray = skeletonData.getAnimations();
+		teeSkeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/tee.skel"));
+		techieSkeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/techie.skel"));
+		laborerSkeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/laborer.skel"));
+		studentSkeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/student.skel"));
+	
+		techieWalkAnimation = techieSkeletonData.findAnimation("walk");
+		laborerWalkAnimation = laborerSkeletonData.findAnimation("walk");
+		studentWalkAnimation = studentSkeletonData.findAnimation("walking");
 		
-		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/tee.skel"));
-		teeSkeleton = new Skeleton(skeletonData);
-		teeWaveAnimation = skelBinary.readAnimation(Gdx.files.internal("data/tee-Wave.anim"), skeletonData);
-		teeSwayAnimation = skelBinary.readAnimation(Gdx.files.internal("data/tee-Sway.anim"), skeletonData);
-		
-		skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/nara.skel"));
-		customerWalkingAnimation = skelBinary.readAnimation(Gdx.files.internal("data/nara-Walk.anim"), skeletonData);
-		customerIdleAnimation = skelBinary.readAnimation(Gdx.files.internal("data/nara-Idle.anim"), skeletonData);
+		teeWaveAnimation = teeSkeletonData.findAnimation("wave");
 		
 		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		//skin.addRegions(new TextureAtlas(Gdx.files.internal("data/uiskin.pack")));
 	}
-	
-	public static Skeleton getCustomerSkeleton(){
-		//skeletonData = skelBinary.readSkeletonData(Gdx.files.internal("data/skeleton.skel"));
-		 return new Skeleton(skeletonData);
-	}
-
 
 }
 

@@ -1,8 +1,8 @@
 package Models;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 
@@ -11,34 +11,49 @@ public class Person extends Actor {
 
 	public Bone root;
 	public Skeleton skeleton;
+	public Animation walkAnimation;
 	float totalTime;
-	Assets assets;
 	int rand;
-	boolean headScratch;
 	public String state;
 	boolean right;
 	
 
 
-	public Person (int width, int height, int rand){		
-		skeleton =  Assets.getCustomerSkeleton();
+	public Person (int width, int height, int rand, int type){	
+		float scaleFactor;
+		
+		switch(type){
+		case 0:
+			skeleton = new Skeleton(Assets.techieSkeletonData);
+			walkAnimation = Assets.techieWalkAnimation;
+			scaleFactor = 0.32f;
+			break;
+		case 1:
+			skeleton = new Skeleton(Assets.laborerSkeletonData);
+			walkAnimation = Assets.laborerWalkAnimation;
+			scaleFactor = 0.08f;
+			break;
+		default:
+			skeleton = new Skeleton(Assets.studentSkeletonData);
+			walkAnimation = Assets.studentWalkAnimation;
+			scaleFactor = 0.1f;
+			break;
+		}
+		
 		this.rand = rand;
-		
 		root = skeleton.getRootBone();
-		
 		if(rand > 0.5){
 			root.setX(width);
 			right = false;
 		}
 		else{ 
-			root.setX(490);
+			root.setX(480);
 			right = true;
 		}
 		root.setY(height);
-		root.setScaleX(.05f);
-		root.setScaleY(.05f);
+		root.setScaleX(scaleFactor);
+		root.setScaleY(scaleFactor);
 		skeleton.updateWorldTransform();
-		headScratch = false;
 	}
 
 	@Override
@@ -78,16 +93,15 @@ public class Person extends Actor {
 		
 		if(right != true){
 		
-		Assets.customerWalkingAnimation.apply(skeleton, totalTime, true);
+		walkAnimation.apply(skeleton, totalTime, true);
 		
 		root.setX(root.getX()+1f);
 		
 		}else{
 			
 			skeleton.setFlipX(true);
-			Assets.customerWalkingAnimation.apply(skeleton, totalTime, true);
+			walkAnimation.apply(skeleton, totalTime, true);
 			root.setX(root.getX()-1f);
-
 		}
 		
 		/*
